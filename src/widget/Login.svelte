@@ -3,19 +3,25 @@
 	import {lang} from "../utils/locale"
 	import matcher from "../utils/loginMatcher"
 	import api from "../api/kyc"
-
     import { createEventDispatcher } from 'svelte';
+
+    export let config;
+
     const dispatch = createEventDispatcher();
-	function onRegisterClick() {
-		dispatch('registerClick');
-	}
-	export let config;
+	
 	let loginType
+    let locale = lang[config.appearance.lang]
 	let codeSent = false
 	let login = ""
 	let password = ""
 	let remember = false
 	let error = false
+    let resent_time_avaliable = 60
+
+    function onRegisterClick() {
+		dispatch('switchComponent', 'register');
+	}
+
 	onMount(async () => {
 		if(await api.userinfo()) {
 			console.log("redirect")
@@ -27,110 +33,145 @@
 		loginType = matcher.matchLoginType(e.target.value)
 	}
 
-	async function onFormSubmit(e) {
+	async function onFormSubmit() {
 		let payload = {
-			login: login,
-			password: password,
+			login,
+			password,
 			client_uid: config.client_uid,
-			remember: remember
+			remember
 		}
+
 		error = await api.auth(payload)
-		await api.userinfo()
-		console.log("redirect")
-		// window.location.href = config.redirectUri
+        if (!error) {
+            if (await api.userinfo()) {
+                console.log("redirect")
+                // window.location.href = config.redirectUri
+            }
+        }
 	}
 
-	async function OnGetCodeClick(e) {
-		codeSent = await api.sendCode({number: login})
+	async function OnGetCodeClick() {
+		error = await api.sendCode({number: login})
+        console.log(error)
+        if (!error) {
+            codeSent = true
+            let interval = setInterval(() => {
+                --resent_time_avaliable;
+                if (resent_time_avaliable <0) {
+                    clearInterval(interval)
+                }
+            }, 1000)
+        }
 	}
 
+    function onRestorePasswordClick() {
+        dispatch('switchComponent', 'recovery');
+    }
 </script>
-<div id="gtn-signin-form-wrapper">
-    <form id="gtn-signin-form"
+
+<div class="gtn-signin-form-wrapper">
+    <form class="gtn-signin-form"
         on:submit|preventDefault={onFormSubmit}
     >
-    <div id="widget-logo">
-        <img src={config.appearance.logo.src} alt="" width={config.appearance.logo.width}>
-    </div>
-    <hr/>
-    {#if error}
-        <div class="alert alert-danger">
-            {error}
-        </div>
-    {/if}
-
-    <input 
-        name="username" 
-        id="username" 
-        placeholder={lang[config.appearance.lang].login} 
-        bind:value={login}
-        class="form-control"
-        on:input={handleLoginChange}
-    />
-    {#if loginType == "email"}
-        <br/>
-        <input 
-            name="password" 
-            id="password" 
-            placeholder={lang[config.appearance.lang].password} 
-            type="password" 
-            class="form-control"
-            bind:value={password}
-        />
-        <br/>
-        {#if config.features.rememberMe}
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="flexCheckDefault" name="rememberMe" bind:value={remember}>
-                <label class="form-check-label" for="flexCheckDefault">
-                    {lang[config.appearance.lang].remember}
-                </label>
-            </div>
-        {/if}
-        <br/>
-        <input id="submitBtn" type="submit" class="form-control btn-outline-secondary" value="{lang[config.appearance.lang].sign_in}"/>
-    {/if}
-    {#if loginType == "sms" & codeSent}
-        <br/>
-        <input 
-            name="verification_code" 
-            id="verification_code" 
-            placeholder={lang[config.appearance.lang].verification_code}
-            class="form-control"
-            bind:value={password}
-        />
-        <br/>
-        {#if config.features.rememberMe}
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="flexCheckDefault" name="rememberMe" bind:value={remember}>
-                <label class="form-check-label" for="flexCheckDefault">
-                    {lang[config.appearance.lang].remember}
-                </label>
-            </div>
-        {/if}
-        <br/>
-        <input id="submitBtn" type="submit" class="form-control btn-outline-secondary" value="{lang[config.appearance.lang].sign_in}"/>
-    {/if}
-    {#if loginType == "sms" & !codeSent}
-        <br/>
-        <input 
-            id="submitBtn" 
-            type="button" 
-            class="form-control btn-outline-secondary" 
-            value="{lang[config.appearance.lang].get_code}"
-            on:click={OnGetCodeClick}		
-        />
-    {/if}
-    {#if config.features.registration}
+        <div class="sign-in-text"><h3>{config.appearance.signInFormText}</h3></div>
         <hr/>
-        <div 
-            id="register-widget"
-            on:click={onRegisterClick}
-        >
-            {lang[config.appearance.lang].no_account} {lang[config.appearance.lang].sign_up}
-        </div>
-    {/if}
+        {#if error}
+            <div class="alert alert-danger widget-alert">
+                {locale[error]} 
+            </div>
+        {/if}
+
+        <input 
+            name="username" 
+            id="username" 
+            placeholder={locale.login} 
+            bind:value={login}
+            class="form-control widget-input"
+            on:input={handleLoginChange}
+        />
+        {#if loginType == "email"}
+            <br/>
+            <input 
+                name="password" 
+                id="password" 
+                placeholder={locale.password} 
+                type="password" 
+                class="form-control widget-input"
+                bind:value={password}
+            />
+            <br/>
+            {#if config.features.rememberMe}
+                <div class="form-check remember-block">
+                    <input class="form-check-input widget-input" type="checkbox" id="flexCheckDefault" name="rememberMe" bind:value={remember}>
+                    <label class="form-check-label" for="flexCheckDefault">
+                        {locale.remember}
+                    </label>
+                </div>
+            {/if}
+            <div id="restore-password-link" on:click={onRestorePasswordClick}>
+                <p class="text-start code_sent">{locale.reset_password}</p>
+            </div>
+            <br/>
+            <input id="submitBtn" type="submit" class="form-control btn-outline-secondary widget-btn" value="{locale.sign_in}"/>
+        {/if}
+        {#if loginType == "sms" & codeSent}
+            <br/>
+            <input 
+                name="verification_code" 
+                id="verification_code" 
+                placeholder={locale.verification_code}
+                class="form-control widget-input"
+                bind:value={password}
+            />
+            <br/>
+            {#if resent_time_avaliable >=0}
+                <div>
+                    <p class="text-start code_sent">{locale.resent_code} {locale.after} {resent_time_avaliable}</p>
+                </div>
+            {:else}
+                <div>
+                    <input
+                        id="submitBtn" 
+                        type="button" 
+                        class="form-control btn-outline-secondary widget-btn" 
+                        value="{locale.resent_code}"
+                        on:click={OnGetCodeClick}		
+                    />
+                </div>
+            {/if}
+            {#if config.features.rememberMe}
+                <div class="form-check">
+                    <input class="form-check-input widget-input" type="checkbox" id="flexCheckDefault" name="rememberMe" bind:value={remember}>
+                    <label class="form-check-label" for="flexCheckDefault">
+                        {locale.remember}
+                    </label>
+                </div>
+            {/if}
+            <br/>
+            <input id="submitBtn" type="submit" class="form-control btn-outline-secondary widget-btn" value="{locale.sign_in}"/>
+        {/if}
+        {#if loginType == "sms" & !codeSent}
+            <br/>
+            <input 
+                id="submitBtn" 
+                type="button" 
+                class="form-control btn-outline-secondary widget-btn" 
+                value="{locale.get_code}"
+                on:click={OnGetCodeClick}		
+            />
+        {/if}
+        {#if config.features.registration}
+            <hr/>
+            <div 
+                id="register_link"
+                on:click={onRegisterClick}
+            >
+                {locale.no_account} {locale.sign_up}
+            </div>
+        {/if}
     </form>
 </div>
+
 <style>
     @keyframes appear {
     0% {
@@ -140,12 +181,21 @@
       opacity: 100;
     }
 }
-#gtn-signin-form {
+.gtn-signin-form {
     padding: 40px;
     animation: 0.7s linear 0s 1 appear;
 }
-
-#widget-logo {
+#register_link {
+    cursor: pointer;
+}
+#restore-password-link {
+    cursor: pointer;
+}
+.sign-in-text {
     text-align: center;
+}
+.remember-block {
+    width: 60%;
+    float: left;
 }
 </style>

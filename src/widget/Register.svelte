@@ -4,18 +4,22 @@
     import api from "../api/kyc"
     import matcher from "../utils/loginMatcher"
     import { createEventDispatcher } from 'svelte';
+
+    export let config;
+
     const dispatch = createEventDispatcher();
+
+    let locale = lang[config.appearance.lang]
     let username = ""
     let login = ""
     let password = ""
     let countries = []
     let confirm_password = ""
     let role = "ru"
-    export let config;
+    let verification_code = ""
     let error = false
-    let success = true
+    let success = false
     let loginType
-    let codeSent = false
 
     onMount(async () => {
 		countries = await api.getCountryRoles()
@@ -29,99 +33,150 @@
 		if (password !== confirm_password) {
             error = "passwords not match"
         }
-        let role_uid = countries.find(c => {
-            return c.code === role
-        }).uid_role
+
+        let role_uid = findRole(countries)
+
         let payload = {
-            login: login,
-            password: password,
+            login,
+            password,
             name: username,
             locale: config.appearance.lang,
             role: role_uid,
         }
         error = await api.register(payload)
+        if (!error) {
+            success = true
+        }
 	}
 
-    async function OnGetCodeClick(e) {
-		codeSent = await api.sendCode({number: login})
-	}
+    async function onConfirmCodeSubmit() {
+        let payload = {
+			login,
+			password: verification_code,
+			client_uid: config.client_uid,
+		}
+
+		error = await api.auth(payload)
+        if (!error) {
+            if (await api.userinfo()) {
+                console.log("redirect")
+                // window.location.href = config.redirectUri
+            }
+        }
+    }
 
     function onLoginClick() {
-        dispatch('loginClick');
+        dispatch('switchComponent', 'login');
+    }
+
+    function findRole(countries) {
+        let roles = countries.find(c => {
+            return c.code === role
+        })
+        let role = roles.find(role => role.name === 'per');
+        return role;
     }
 </script>
 
-<div id="gtn-register-form-wrapper">
-    <form id="gtn-register-form"
-        on:submit|preventDefault={onFormSubmit}
-    >
-    <div id="widget-logo">
-        <img src={config.appearance.logo.src} alt="" width={config.appearance.logo.width}>
-    </div>
-    <hr/>
-    {#if error}
-        <div class="alert alert-danger">
-            {error}
-        </div>
-    {/if}
-    {#if success}
-        <div class="alert alert-success">
-            {lang[config.appearance.lang].reg_success}<br/>
-            <span on:click={onLoginClick}>Вход</span>
-        </div>
-    {/if}
-    <input 
-        name="username" 
-        id="username" 
-        placeholder={lang[config.appearance.lang].username} 
-        bind:value={username}
-        class="form-control"
-    />
-    <br/>
-    <input 
-        name="login" 
-        id="login" 
-        placeholder={lang[config.appearance.lang].login} 
-        bind:value={login}
-        class="form-control"
-        on:input={handleLoginChange}
-    />
-    {#if loginType === "email"}
-        <br/>
+<div class="gtn-register-form-wrapper">
+    
+    {#if loginType === "sms" & success}
+        <form
+            class="gtn-register-form"
+            on:submit|preventDefault={onConfirmCodeSubmit}
+        >
+        <div class="sign-in-text"><h3>{config.appearance.signUpFormText}</h3></div>
+        {#if error}
+            <div class="alert alert-danger widget-alert">
+                {error}
+            </div>
+        {/if}
+        <hr/>
+            <input 
+                name="verification_code" 
+                id="verification_code" 
+                placeholder={locale.verification_code} 
+                bind:value={verification_code}
+                class="form-control widget-input"
+            />
+            
+            <br/>
+            <p class="text-start code_sent">{locale.code_sent} {login}</p>
+            <input id="submitBtn" type="submit" class="form-control btn-outline-secondary widget-btn" value="{locale.sign_in}"/>
+        </form>
+    {:else}
+        <form class="gtn-register-form"
+            on:submit|preventDefault={onFormSubmit}
+        >
+        <div class="sign-in-text"><h3>{config.appearance.signUpFormText}</h3></div>
+        <hr/>
+        {#if error}
+            <div class="alert alert-danger">
+                {error}
+            </div>
+        {/if}
+        {#if success & loginType === "email"}
+            <div class="alert alert-success widget-alert">
+                {locale.reg_success}<br/>
+                {locale.email_sent} {login}
+                <span on:click={onLoginClick}>Вход</span>
+            </div>
+        {/if}
         <input 
-            name="password" 
-            id="password" 
-            type="password"
-            placeholder={lang[config.appearance.lang].password} 
-            bind:value={password}
-            class="form-control"
+            name="username" 
+            id="username" 
+            placeholder={locale.username} 
+            bind:value={username}
+            class="form-control widget-input"
         />
         <br/>
         <input 
-            name="confirm_password" 
-            id="confirm_password" 
-            type="password"
-            placeholder={lang[config.appearance.lang].confirm_password} 
-            bind:value={confirm_password}
-            class="form-control"
+            name="login" 
+            id="login" 
+            placeholder={locale.login} 
+            bind:value={login}
+            class="form-control widget-input"
+            on:input={handleLoginChange}
         />
+        {#if loginType === "email"}
+            <br/>
+            <input 
+                name="password" 
+                id="password" 
+                type="password"
+                placeholder={locale.password} 
+                bind:value={password}
+                class="form-control widget-input"
+            />
+            <br/>
+            <input 
+                name="confirm_password" 
+                id="confirm_password" 
+                type="password"
+                placeholder={locale.confirm_password} 
+                bind:value={confirm_password}
+                class="form-control widget-input"
+            />
+        {/if}
+        <br/>
+        <select class="form-control widget-select" aria-label="Default select example" bind:value={role}>
+            {#each countries as country}
+                <option value={country.code}>{country.name}</option>
+            {/each}
+            
+        </select>
+        <br/>
+        <input id="submitBtn" type="submit" class="form-control btn-outline-secondary widget-btn" value="{locale.sign_up}"/>
+        <br/>
+        <div on:click={onLoginClick} id="get_back_link">
+            {locale.get_back} 
+        </div>
+        </form>
     {/if}
-    <br/>
-    <select class="form-control" aria-label="Default select example" bind:value={role}>
-        {#each countries as country}
-            <option value={country.code}>{country.name}</option>
-        {/each}
-        
-    </select>
-    <br/>
-    <input id="submitBtn" type="submit" class="form-control btn-outline-secondary" value="{lang[config.appearance.lang].sign_up}"/>
-    <br/>
-    <div on:click={onLoginClick}>
-        Назадло
-    </div>
-    </form>
+    
 
 </div>
+
 <style>
     @keyframes slideInFromLeftRegister {
     0% {
@@ -133,11 +188,18 @@
       transform: translateX(0);
     }
 }
-#gtn-register-form {
+.gtn-register-form {
     padding: 40px;
     animation: 0.7s ease-out 0s 1 slideInFromLeftRegister;
 }
-#widget-logo {
+.code_sent {
+    color: #888787;
+    font-size: 15px;
+}
+#get_back_link {
+    cursor: pointer;
+}
+.sign-in-text {
     text-align: center;
 }
 </style>

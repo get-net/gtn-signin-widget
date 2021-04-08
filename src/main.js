@@ -7,6 +7,8 @@ let widgetConfig = {
             src: "https://www.x5.ru/ru/assets/img/content/logo-01.jpg",
             width: "100px"
         },
+		signInFormText: "Зайти в пятерочку",
+		signUpFormText: "Зарегаться в пятерочке",
         lang: "ru",
 		width: "500px"
     },
