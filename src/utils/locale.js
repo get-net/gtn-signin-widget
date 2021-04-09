@@ -25,7 +25,8 @@ export const lang = {
         reset_password: "Забыли пароль?",
         email: "Адрес электронной почты",
         reset_with_email: "Восстановить",
-        revovery_sent: "Ссылка для восстановления отправлена на "
+        revovery_sent: "Ссылка для восстановления отправлена на ",
+        enter: "Вход"
     },
     en: {
         login: "Email or phone number",
@@ -52,6 +53,7 @@ export const lang = {
         reset_password: "Forgot password?",
         email: "Email",
         reset_with_email: "Reset via email",
-        revovery_sent: "Recovery link sent to "
+        revovery_sent: "Recovery link sent to ",
+        enter: "Sign in"
     }
 }

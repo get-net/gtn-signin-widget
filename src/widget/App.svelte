@@ -3,7 +3,6 @@
 	import Register from "./Register.svelte"
 	import Login from './Login.svelte';
 	import Recovery from './Recovery.svelte';
-	import Verified from './Verified.svelte';
 	export let config;
 
 	let component = "login"
@@ -19,7 +18,6 @@
 	<div class="widget-logo">
         <img src={config.appearance.logo.src} alt="" width={config.appearance.logo.width}>
     </div>
-	<Verified></Verified>
 	{#if component === "register"}
 		<Register config={config} on:switchComponent = {onSwithComponentClick}>
 		</Register>

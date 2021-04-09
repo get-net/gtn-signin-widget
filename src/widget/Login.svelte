@@ -162,9 +162,12 @@
         {/if}
         {#if config.features.registration}
             <hr/>
-            <a on:click={onRegisterClick} class="link">
+            <div
+                on:click={onRegisterClick} 
+                class="link"
+            >
                 {locale.sign_up}
-            </a>
+            </div>
         {/if}
     </form>
 </div>

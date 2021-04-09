@@ -50,9 +50,10 @@
         />
         <br/>
         {#if !success}
-            <input id="submitBtn" type="submit" class="form-control btn-outline-secondary widget-btn" value="{locale.reset_with_email}"/>
+            <input id="submitBtn" type="submit" class="form-control btn-primary widget-btn" value="{locale.reset_with_email}"/>
         {/if}
-        <div on:click={onLoginClick} id="get_back_link">
+        <hr/>
+        <div on:click={onLoginClick} class="link">
             {locale.get_back} 
         </div>
     </form>

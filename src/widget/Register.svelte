@@ -4,6 +4,7 @@
     import api from "../api/kyc"
     import matcher from "../utils/loginMatcher"
     import { createEventDispatcher } from 'svelte';
+import RegisterSms from './RegisterSms.svelte';
 
     export let config;
 
@@ -50,21 +51,7 @@
         }
 	}
 
-    async function onConfirmCodeSubmit() {
-        let payload = {
-			login,
-			password: verification_code,
-			client_uid: config.client_uid,
-		}
-
-		error = await api.auth(payload)
-        if (!error) {
-            if (await api.userinfo()) {
-                console.log("redirect")
-                // window.location.href = config.redirectUri
-            }
-        }
-    }
+    
 
     function onLoginClick() {
         dispatch('switchComponent', 'login');
@@ -80,31 +67,8 @@
 </script>
 
 <div class="gtn-register-form-wrapper">
-    
     {#if loginType === "sms" & success}
-        <form
-            class="gtn-register-form"
-            on:submit|preventDefault={onConfirmCodeSubmit}
-        >
-        <div class="sign-in-text"><h3>{config.appearance.signUpFormText}</h3></div>
-        {#if error}
-            <div class="alert alert-danger widget-alert">
-                {error}
-            </div>
-        {/if}
-        <hr/>
-            <input 
-                name="verification_code" 
-                id="verification_code" 
-                placeholder={locale.verification_code} 
-                bind:value={verification_code}
-                class="form-control widget-input"
-            />
-            
-            <br/>
-            <p class="text-start code_sent">{locale.code_sent} {login}</p>
-            <input id="submitBtn" type="submit" class="form-control btn-primary widget-btn" value="{locale.sign_in}"/>
-        </form>
+        <RegisterSms config={config} login={login}></RegisterSms>
     {:else}
         <form class="gtn-register-form"
             on:submit|preventDefault={onFormSubmit}
@@ -120,58 +84,68 @@
             <div class="alert alert-success widget-alert">
                 {locale.reg_success}<br/>
                 {locale.email_sent} {login}
-                <span on:click={onLoginClick}>Вход</span>
             </div>
-        {/if}
-        <input 
-            name="username" 
-            id="username" 
-            placeholder={locale.username} 
-            bind:value={username}
-            class="form-control widget-input"
-        />
-        <br/>
-        <input 
-            name="login" 
-            id="login" 
-            placeholder={locale.login} 
-            bind:value={login}
-            class="form-control widget-input"
-            on:input={handleLoginChange}
-        />
-        {#if loginType === "email"}
-            <br/>
-            <input 
-                name="password" 
-                id="password" 
-                type="password"
-                placeholder={locale.password} 
-                bind:value={password}
+            <hr/>
+            <div
+                on:click={onLoginClick}
+                class="link"
+            >
+                {locale.enter}
+            </div>
+        {:else}
+                <input 
+                name="username" 
+                id="username" 
+                placeholder={locale.username} 
+                bind:value={username}
                 class="form-control widget-input"
             />
             <br/>
             <input 
-                name="confirm_password" 
-                id="confirm_password" 
-                type="password"
-                placeholder={locale.confirm_password} 
-                bind:value={confirm_password}
+                name="login" 
+                id="login" 
+                placeholder={locale.login} 
+                bind:value={login}
                 class="form-control widget-input"
+                on:input={handleLoginChange}
             />
-        {/if}
-        <br/>
-        <select class="form-control widget-select" aria-label="Default select example" bind:value={role}>
-            {#each countries as country}
-                <option value={country.code}>{country.name}</option>
-            {/each}
-            
-        </select>
-        <br/>
-        <input id="submitBtn" type="submit" class="form-control btn-primary widget-btn" value="{locale.sign_up}"/>
-        <br/>
-        <a on:click={onLoginClick} class="link">
-            {locale.get_back}
-        </a>
+            {#if loginType === "email"}
+                <br/>
+                <input 
+                    name="password" 
+                    id="password" 
+                    type="password"
+                    placeholder={locale.password} 
+                    bind:value={password}
+                    class="form-control widget-input"
+                />
+                <br/>
+                <input 
+                    name="confirm_password" 
+                    id="confirm_password" 
+                    type="password"
+                    placeholder={locale.confirm_password} 
+                    bind:value={confirm_password}
+                    class="form-control widget-input"
+                />
+            {/if}
+            <br/>
+            <select class="form-control widget-select" aria-label="Default select example" bind:value={role}>
+                {#each countries as country}
+                    <option value={country.code}>{country.name}</option>
+                {/each}
+                
+            </select>
+            <br/>
+            <input id="submitBtn" type="submit" class="form-control btn-primary widget-btn" value="{locale.sign_up}"/>
+            <hr/>
+            <div 
+                on:click={onLoginClick} 
+                class="link"
+            >
+                {locale.get_back}
+            </div>
+        {/if} 
         </form>
     {/if}
     
