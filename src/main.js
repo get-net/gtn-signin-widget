@@ -17,7 +17,13 @@ let widgetConfig = {
         rememberMe : true
     }
 }
-let w = new SignInGTN(widgetConfig)
+const scal = function() {
+	alert()
+}
+const ercal = function() {
+	alert("bad")
+}
+let w = new SignInGTN(widgetConfig, scal, ercal)
 
 w.renderEl("app")
 window.widget = SignInGTN

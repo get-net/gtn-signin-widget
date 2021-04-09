@@ -102,17 +102,17 @@
             <br/>
             {#if config.features.rememberMe}
                 <div class="form-check remember-block">
-                    <input class="form-check-input widget-input" type="checkbox" id="flexCheckDefault" name="rememberMe" bind:value={remember}>
+                    <input class="form-check-input" type="checkbox" id="flexCheckDefault" name="rememberMe" bind:value={remember}>
                     <label class="form-check-label" for="flexCheckDefault">
                         {locale.remember}
                     </label>
                 </div>
             {/if}
-            <div id="restore-password-link" on:click={onRestorePasswordClick}>
+            <div class="link" on:click={onRestorePasswordClick}>
                 <p class="text-start code_sent">{locale.reset_password}</p>
             </div>
             <br/>
-            <input id="submitBtn" type="submit" class="form-control btn-outline-secondary widget-btn" value="{locale.sign_in}"/>
+            <input id="submitBtn" type="submit" class="form-control btn-primary widget-btn" value="{locale.sign_in}"/>
         {/if}
         {#if loginType == "sms" & codeSent}
             <br/>
@@ -133,7 +133,7 @@
                     <input
                         id="submitBtn" 
                         type="button" 
-                        class="form-control btn-outline-secondary widget-btn" 
+                        class="form-control btn-primary widget-btn" 
                         value="{locale.resent_code}"
                         on:click={OnGetCodeClick}		
                     />
@@ -148,54 +148,47 @@
                 </div>
             {/if}
             <br/>
-            <input id="submitBtn" type="submit" class="form-control btn-outline-secondary widget-btn" value="{locale.sign_in}"/>
+            <input id="submitBtn" type="submit" class="form-control btn-primary widget-btn" value="{locale.sign_in}"/>
         {/if}
         {#if loginType == "sms" & !codeSent}
             <br/>
             <input 
                 id="submitBtn" 
                 type="button" 
-                class="form-control btn-outline-secondary widget-btn" 
+                class="form-control btn-primary widget-btn" 
                 value="{locale.get_code}"
                 on:click={OnGetCodeClick}		
             />
         {/if}
         {#if config.features.registration}
             <hr/>
-            <div 
-                id="register_link"
-                on:click={onRegisterClick}
-            >
-                {locale.no_account} {locale.sign_up}
-            </div>
+            <a on:click={onRegisterClick} class="link">
+                {locale.sign_up}
+            </a>
         {/if}
     </form>
 </div>
 
 <style>
     @keyframes appear {
-    0% {
-        opacity: 0;
+        0% {
+            opacity: 0;
+        }
+        100% {
+            opacity: 100;
+        }
     }
-    100% {
-      opacity: 100;
+    .gtn-signin-form {
+        padding: 40px;
+        animation: 0.7s linear 0s 1 appear;
     }
-}
-.gtn-signin-form {
-    padding: 40px;
-    animation: 0.7s linear 0s 1 appear;
-}
-#register_link {
-    cursor: pointer;
-}
-#restore-password-link {
-    cursor: pointer;
-}
-.sign-in-text {
-    text-align: center;
-}
-.remember-block {
-    width: 60%;
-    float: left;
-}
+
+    .sign-in-text {
+        text-align: center;
+    }
+    .remember-block {
+        width: 60%;
+        float: left;
+    }
+
 </style>

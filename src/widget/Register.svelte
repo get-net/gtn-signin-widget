@@ -42,6 +42,7 @@
             name: username,
             locale: config.appearance.lang,
             role: role_uid,
+            client_uid: config.client_uid
         }
         error = await api.register(payload)
         if (!error) {
@@ -72,9 +73,9 @@
     function findRole(countries) {
         let roles = countries.find(c => {
             return c.code === role
-        })
-        let role = roles.find(role => role.name === 'per');
-        return role;
+        }).roles
+        let role_uid = roles.find(role_item => role_item.name === 'per').uid;
+        return role_uid;
     }
 </script>
 
@@ -102,7 +103,7 @@
             
             <br/>
             <p class="text-start code_sent">{locale.code_sent} {login}</p>
-            <input id="submitBtn" type="submit" class="form-control btn-outline-secondary widget-btn" value="{locale.sign_in}"/>
+            <input id="submitBtn" type="submit" class="form-control btn-primary widget-btn" value="{locale.sign_in}"/>
         </form>
     {:else}
         <form class="gtn-register-form"
@@ -111,7 +112,7 @@
         <div class="sign-in-text"><h3>{config.appearance.signUpFormText}</h3></div>
         <hr/>
         {#if error}
-            <div class="alert alert-danger">
+            <div class="alert alert-danger widget-alert">
                 {error}
             </div>
         {/if}
@@ -166,11 +167,11 @@
             
         </select>
         <br/>
-        <input id="submitBtn" type="submit" class="form-control btn-outline-secondary widget-btn" value="{locale.sign_up}"/>
+        <input id="submitBtn" type="submit" class="form-control btn-primary widget-btn" value="{locale.sign_up}"/>
         <br/>
-        <div on:click={onLoginClick} id="get_back_link">
-            {locale.get_back} 
-        </div>
+        <a on:click={onLoginClick} class="link">
+            {locale.get_back}
+        </a>
         </form>
     {/if}
     
@@ -179,27 +180,24 @@
 
 <style>
     @keyframes slideInFromLeftRegister {
-    0% {
-        opacity: 0;
-      transform: translateX(-20%);
+        0% {
+            opacity: 0;
+            transform: translateX(-20%);
+        }
+        100% {
+            opacity: 100;
+            transform: translateX(0);
+        }
     }
-    100% {
-      opacity: 100;
-      transform: translateX(0);
+    .gtn-register-form {
+        padding: 40px;
+        animation: 0.7s ease-out 0s 1 slideInFromLeftRegister;
     }
-}
-.gtn-register-form {
-    padding: 40px;
-    animation: 0.7s ease-out 0s 1 slideInFromLeftRegister;
-}
-.code_sent {
-    color: #888787;
-    font-size: 15px;
-}
-#get_back_link {
-    cursor: pointer;
-}
-.sign-in-text {
-    text-align: center;
-}
+    .code_sent {
+        color: #888787;
+        font-size: 15px;
+    }
+    .sign-in-text {
+        text-align: center;
+    }
 </style>
