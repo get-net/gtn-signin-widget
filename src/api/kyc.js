@@ -7,13 +7,13 @@ export default {
             .then(({data}) => {
                 if (data.success) {
                     storageManager.setToken(data.result.access_token)
-                    return false
+                    return [true, null]
                 }
 
-                return data.error_code
-            }).catch(e => {
-                console.log(e)
-                return e
+                return [false, data.error_code]
+            }).catch(er => {
+                window.$gtn_widget.errorCallback(er)
+                return [false, er]
             })
     },
 
@@ -24,7 +24,7 @@ export default {
                 storageManager.setUserInfo(data)
                 return true
             }).catch(er => {
-                console.log(er)
+                window.$gtn_widget.errorCallback(er)
                 return false
             })
     },
@@ -33,12 +33,12 @@ export default {
         return kyc.post("papi/v1/agent/register", body)
             .then(({data}) => {
                 if (data.success) {
-                    return false
+                    return [true, null]
                 }
-                return data.error_code
+                return [false, data.error_code]
             }).catch(er => {
-                console.log(er)
-                return true
+                window.$gtn_widget.errorCallback(er)
+                return [false, er]
             })
     },
 
@@ -47,7 +47,7 @@ export default {
             .then(({data}) => {
                 return data
             }).catch(er => {
-                console.log(er)
+                window.$gtn_widget.errorCallback(er)
                 return false
             })
     },
@@ -56,13 +56,13 @@ export default {
         return kyc.post("/profile/agent/send_code", payload)
             .then(({data}) => {
                 if (data.success) {
-                    return false
+                    return [true, null]
                 }
-                return data.error_code
+                return [false, data.error_code]
             })
-            .catch(e => {
-                console.log(e)
-                return e
+            .catch(er => {
+                window.$gtn_widget.errorCallback(er)
+                return [false, er]
             })
     },
 
@@ -70,12 +70,13 @@ export default {
         return kyc.post("/profile/agent/recovery", payload)
             .then(({data}) => {
                 if (data.success) {
-                    return false
+                    return [true, null]
                 }
-                return data.error_code
+                return [false, data.error_code]
             })
-            .catch(e => {
-                return e
+            .catch(er => {
+                window.$gtn_widget.errorCallback(er)
+                return [false, er]
             })
     }
 }

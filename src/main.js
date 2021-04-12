@@ -9,22 +9,24 @@ let widgetConfig = {
         },
 		signInFormText: "Зайти в пятерочку",
 		signUpFormText: "Зарегаться в пятерочке",
-        lang: "ru",
 		width: "500px"
     },
+    lang: "ru",
     features: {
         registration: true,
         rememberMe : true
     }
 }
+
 const scal = function() {
-	alert()
+	alert("verification succeded")
 }
-const ercal = function() {
+const ercal = function(error) {
+    console.log(error)
 	alert("bad")
 }
+
 let w = new SignInGTN(widgetConfig, scal, ercal)
 
 w.renderEl("app")
-window.widget = SignInGTN
 export default SignInGTN;

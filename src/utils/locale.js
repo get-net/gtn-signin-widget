@@ -17,6 +17,7 @@ export const lang = {
         get_back: "Назад",
         invalid_password: "Невернный пароль",
         user_not_exists: "Пользователя с таким логином не существует",
+        user_exists: "Пользователь с таким логином уже существует",
         email_not_verified: "Аккаунт не верифицирован",
         user_disabled: "Аккаунт заблокирован",
         resent_code: "Отправить повторно",
@@ -26,7 +27,9 @@ export const lang = {
         email: "Адрес электронной почты",
         reset_with_email: "Восстановить",
         revovery_sent: "Ссылка для восстановления отправлена на ",
-        enter: "Вход"
+        enter: "Вход",
+        passwords_not_match: "Пароли не совпадают",
+        verification_failed: "Неверный код подтверждения"
     },
     en: {
         login: "Email or phone number",
@@ -45,6 +48,7 @@ export const lang = {
         get_back: "Back to sign in",
         invalid_password: "Invalid password",
         user_not_exists: "User with this login does not exist",
+        user_exists: "User with this login already exists",
         email_not_verified: "Account not verified",
         user_disabled: "Account disabled",
         resent_code: "Send again",
@@ -54,6 +58,8 @@ export const lang = {
         email: "Email",
         reset_with_email: "Reset via email",
         revovery_sent: "Recovery link sent to ",
-        enter: "Sign in"
+        enter: "Sign in",
+        passwords_not_match: "Passwords do not match",
+        verification_failed: "The code is invalid or already acknowledged. please try again later"
     }
 }

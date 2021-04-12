@@ -7,7 +7,7 @@ export default {
         window.localStorage.setItem('gtn_access_token', value)
     },
     removeToken() {
-        window.localStorage.removeItem("gtn_acces_token")
+        window.localStorage.removeItem("gtn_access_token")
     },
     setUserInfo(value) {
         let stringified_value = JSON.stringify(value)

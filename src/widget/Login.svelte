@@ -8,14 +8,14 @@
     export let config;
 
     const dispatch = createEventDispatcher();
-	
+
 	let loginType
-    let locale = lang[config.appearance.lang]
+    let locale = lang[config.lang]
 	let codeSent = false
 	let login = ""
 	let password = ""
 	let remember = false
-	let error = false
+	let error = ""
     let resent_time_avaliable = 60
 
     function onRegisterClick() {
@@ -23,10 +23,7 @@
 	}
 
 	onMount(async () => {
-		if(await api.userinfo()) {
-			console.log("redirect")
-			//window.location.href = config.redirectUri
-		}
+		await checkUserInfo()
 	});
 
 	function handleLoginChange(e) {
@@ -38,22 +35,22 @@
 			login,
 			password,
 			client_uid: config.client_uid,
-			remember
+			remember,
+            locale: config.lang
 		}
 
-		error = await api.auth(payload)
-        if (!error) {
-            if (await api.userinfo()) {
-                console.log("redirect")
-                // window.location.href = config.redirectUri
-            }
+		let [resp_success, error_code] = await api.auth(payload)
+        error = error_code
+
+        if (resp_success) {
+            await checkUserInfo()
         }
 	}
 
 	async function OnGetCodeClick() {
-		error = await api.sendCode({number: login})
-        console.log(error)
-        if (!error) {
+		let [resp_success, error_code] = await api.sendCode({number: login, locale: config.lang})
+        error = error_code
+        if (resp_success) {
             codeSent = true
             let interval = setInterval(() => {
                 --resent_time_avaliable;
@@ -64,9 +61,16 @@
         }
 	}
 
+    async function checkUserInfo() {
+        if (await api.userinfo()) {
+            window.$gtn_widget.successCallback()
+        }
+    }
+
     function onRestorePasswordClick() {
         dispatch('switchComponent', 'recovery');
     }
+
 </script>
 
 <div class="gtn-signin-form-wrapper">
@@ -76,7 +80,7 @@
         <div class="sign-in-text"><h3>{config.appearance.signInFormText}</h3></div>
         <hr/>
         {#if error}
-            <div class="alert alert-danger widget-alert">
+            <div class="alert-danger widget-alert">
                 {locale[error]} 
             </div>
         {/if}
@@ -86,7 +90,7 @@
             id="username" 
             placeholder={locale.login} 
             bind:value={login}
-            class="form-control widget-input"
+            class="widget-input"
             on:input={handleLoginChange}
         />
         {#if loginType == "email"}
@@ -96,23 +100,23 @@
                 id="password" 
                 placeholder={locale.password} 
                 type="password" 
-                class="form-control widget-input"
+                class="widget-input"
                 bind:value={password}
             />
             <br/>
             {#if config.features.rememberMe}
-                <div class="form-check remember-block">
-                    <input class="form-check-input" type="checkbox" id="flexCheckDefault" name="rememberMe" bind:value={remember}>
-                    <label class="form-check-label" for="flexCheckDefault">
+                <div class="remember-block">
+                    <input class="widget-input-check" type="checkbox" id="flexCheckDefault" name="rememberMe" bind:value={remember}>
+                    <label class="" for="flexCheckDefault">
                         {locale.remember}
                     </label>
                 </div>
             {/if}
             <div class="link" on:click={onRestorePasswordClick}>
-                <p class="text-start code_sent">{locale.reset_password}</p>
+                <p class="code_sent">{locale.reset_password}</p>
             </div>
             <br/>
-            <input id="submitBtn" type="submit" class="form-control btn-primary widget-btn" value="{locale.sign_in}"/>
+            <input id="submitBtn" type="submit" class="widget-input widget-btn" value="{locale.sign_in}"/>
         {/if}
         {#if loginType == "sms" & codeSent}
             <br/>
@@ -126,36 +130,36 @@
             <br/>
             {#if resent_time_avaliable >=0}
                 <div>
-                    <p class="text-start code_sent">{locale.resent_code} {locale.after} {resent_time_avaliable}</p>
+                    <p class="code_sent">{locale.resent_code} {locale.after} {resent_time_avaliable}</p>
                 </div>
             {:else}
                 <div>
                     <input
                         id="submitBtn" 
                         type="button" 
-                        class="form-control btn-primary widget-btn" 
+                        class="widget-input widget-btn" 
                         value="{locale.resent_code}"
                         on:click={OnGetCodeClick}		
                     />
                 </div>
             {/if}
             {#if config.features.rememberMe}
-                <div class="form-check">
-                    <input class="form-check-input widget-input" type="checkbox" id="flexCheckDefault" name="rememberMe" bind:value={remember}>
-                    <label class="form-check-label" for="flexCheckDefault">
+                <div class="remember-block">
+                    <input class="widget-input-check" type="checkbox" id="flexCheckDefault" name="rememberMe" bind:value={remember}>
+                    <label for="flexCheckDefault">
                         {locale.remember}
                     </label>
                 </div>
             {/if}
             <br/>
-            <input id="submitBtn" type="submit" class="form-control btn-primary widget-btn" value="{locale.sign_in}"/>
+            <input id="submitBtn" type="submit" class="widget-input widget-btn" value="{locale.sign_in}"/>
         {/if}
         {#if loginType == "sms" & !codeSent}
             <br/>
             <input 
                 id="submitBtn" 
                 type="button" 
-                class="form-control btn-primary widget-btn" 
+                class="widget-input widget-btn" 
                 value="{locale.get_code}"
                 on:click={OnGetCodeClick}		
             />
@@ -192,6 +196,7 @@
     .remember-block {
         width: 60%;
         float: left;
+        margin-bottom: 1rem;
     }
 
 </style>

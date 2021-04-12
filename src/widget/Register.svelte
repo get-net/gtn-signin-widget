@@ -4,21 +4,21 @@
     import api from "../api/kyc"
     import matcher from "../utils/loginMatcher"
     import { createEventDispatcher } from 'svelte';
-import RegisterSms from './RegisterSms.svelte';
+    import RegisterSms from './RegisterSms.svelte';
 
     export let config;
 
     const dispatch = createEventDispatcher();
 
-    let locale = lang[config.appearance.lang]
+    let locale = lang[config.lang]
     let username = ""
     let login = ""
     let password = ""
     let countries = []
     let confirm_password = ""
     let role = "ru"
-    let verification_code = ""
     let error = false
+    let error_code = ""
     let success = false
     let loginType
 
@@ -31,8 +31,9 @@ import RegisterSms from './RegisterSms.svelte';
 	}
 
     async function onFormSubmit(e) {
-		if (password !== confirm_password) {
-            error = "passwords not match"
+		if (password !== confirm_password && loginType === "email") {
+            error = "passwords_not_match"
+            return;
         }
 
         let role_uid = findRole(countries)
@@ -41,17 +42,15 @@ import RegisterSms from './RegisterSms.svelte';
             login,
             password,
             name: username,
-            locale: config.appearance.lang,
+            locale: config.lang,
             role: role_uid,
-            client_uid: config.client_uid
+            client_uid: config.client_uid,
         }
-        error = await api.register(payload)
-        if (!error) {
-            success = true
-        }
-	}
 
-    
+        let [resp_success, error_code] = await api.register(payload)
+        success = resp_success
+        error = error_code
+	}
 
     function onLoginClick() {
         dispatch('switchComponent', 'login');
@@ -76,12 +75,12 @@ import RegisterSms from './RegisterSms.svelte';
         <div class="sign-in-text"><h3>{config.appearance.signUpFormText}</h3></div>
         <hr/>
         {#if error}
-            <div class="alert alert-danger widget-alert">
-                {error}
+            <div class="alert-danger widget-alert">
+                {locale[error]} 
             </div>
         {/if}
         {#if success & loginType === "email"}
-            <div class="alert alert-success widget-alert">
+            <div class="alert-success widget-alert">
                 {locale.reg_success}<br/>
                 {locale.email_sent} {login}
             </div>
@@ -98,7 +97,7 @@ import RegisterSms from './RegisterSms.svelte';
                 id="username" 
                 placeholder={locale.username} 
                 bind:value={username}
-                class="form-control widget-input"
+                class="widget-input"
             />
             <br/>
             <input 
@@ -106,7 +105,7 @@ import RegisterSms from './RegisterSms.svelte';
                 id="login" 
                 placeholder={locale.login} 
                 bind:value={login}
-                class="form-control widget-input"
+                class="widget-input"
                 on:input={handleLoginChange}
             />
             {#if loginType === "email"}
@@ -117,7 +116,7 @@ import RegisterSms from './RegisterSms.svelte';
                     type="password"
                     placeholder={locale.password} 
                     bind:value={password}
-                    class="form-control widget-input"
+                    class="widget-input"
                 />
                 <br/>
                 <input 
@@ -126,18 +125,18 @@ import RegisterSms from './RegisterSms.svelte';
                     type="password"
                     placeholder={locale.confirm_password} 
                     bind:value={confirm_password}
-                    class="form-control widget-input"
+                    class="widget-input"
                 />
             {/if}
             <br/>
-            <select class="form-control widget-select" aria-label="Default select example" bind:value={role}>
+            <select class="widget-input widget-select" aria-label="Default select example" bind:value={role}>
                 {#each countries as country}
                     <option value={country.code}>{country.name}</option>
                 {/each}
                 
             </select>
             <br/>
-            <input id="submitBtn" type="submit" class="form-control btn-primary widget-btn" value="{locale.sign_up}"/>
+            <input id="submitBtn" type="submit" class="widget-input widget-btn" value="{locale.sign_up}"/>
             <hr/>
             <div 
                 on:click={onLoginClick} 
@@ -166,10 +165,6 @@ import RegisterSms from './RegisterSms.svelte';
     .gtn-register-form {
         padding: 40px;
         animation: 0.7s ease-out 0s 1 slideInFromLeftRegister;
-    }
-    .code_sent {
-        color: #888787;
-        font-size: 15px;
     }
     .sign-in-text {
         text-align: center;
