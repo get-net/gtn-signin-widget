@@ -3,7 +3,7 @@ import storageManager from "../utils/storageManager"
 export default {
 
     async auth(payload) {
-        return kyc.post("papi/v1/agent/authorize/", payload)
+        return kyc.post(`papi/v1/agent/authorize?client_uid=${payload.client_uid}`, payload)
             .then(({data}) => {
                 if (data.success) {
                     storageManager.setToken(data.result.access_token)
@@ -29,8 +29,8 @@ export default {
             })
     },
 
-    async register(body) {
-        return kyc.post("papi/v1/agent/register", body)
+    async register(payload) {
+        return kyc.post(`papi/v1/agent/register?client_uid=${payload.client_uid}`, payload)
             .then(({data}) => {
                 if (data.success) {
                     return [true, null]
