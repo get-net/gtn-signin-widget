@@ -35,6 +35,7 @@ export default {
                 if (data.success) {
                     return [true, null]
                 }
+
                 return [false, data.error_code]
             }).catch(er => {
                 window.$gtn_widget.errorCallback(er)
@@ -58,6 +59,7 @@ export default {
                 if (data.success) {
                     return [true, null]
                 }
+
                 return [false, data.error_code]
             })
             .catch(er => {
@@ -72,6 +74,7 @@ export default {
                 if (data.success) {
                     return [true, null]
                 }
+
                 return [false, data.error_code]
             })
             .catch(er => {
