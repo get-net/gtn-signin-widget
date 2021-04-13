@@ -12,12 +12,10 @@
             login,
             password: verification_code,
             locale: config.lang,
+            client_uid: config.client_uid
         };
 
-        let [resp_success, error_code] = await api.auth(
-            payload,
-            config.client_uid
-        );
+        let [resp_success, error_code] = await api.auth(payload);
         error = error_code;
 
         if (resp_success) {

@@ -36,12 +36,10 @@
             password,
             remember,
             locale: config.lang,
+            client_uid: config.client_uid
         };
 
-        let [resp_success, error_code] = await api.auth(
-            payload,
-            config.client_uid
-        );
+        let [resp_success, error_code] = await api.auth(payload);
         error = error_code;
 
         if (resp_success) {
@@ -51,8 +49,7 @@
 
     async function OnGetCodeClick() {
         let [resp_success, error_code] = await api.sendCode(
-            { number: login, locale: config.lang },
-            config.client_uid
+            { number: login, locale: config.lang }
         );
         error = error_code;
         if (resp_success) {

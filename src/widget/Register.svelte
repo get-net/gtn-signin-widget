@@ -43,12 +43,10 @@
             name: username,
             locale: config.lang,
             role: role_uid,
+            client_uid: config.client_uid
         };
 
-        let [resp_success, error_code] = await api.register(
-            payload,
-            config.client_uid
-        );
+        let [resp_success, error_code] = await api.register(payload);
         success = resp_success;
         error = error_code;
     }

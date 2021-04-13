@@ -7,7 +7,7 @@ This library gives you a customizable login widget, that can be used to authenti
 ## Get started
 To use this library you need to do the following steps:
 1. Visit our [kyc service](https://id.gtn.ee/)
-2. Create your own application 
+2. Create your own application
 ![alt Applications list](img/applications.png)
 ![alt create application](img/add_app.png)
 3. Provide redirect uri, its the base url of your app, where widget is gona be used
