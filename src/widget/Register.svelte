@@ -18,7 +18,6 @@
     let confirm_password = ""
     let role = "ru"
     let error = false
-    let error_code = ""
     let success = false
     let loginType
 

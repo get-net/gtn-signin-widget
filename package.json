@@ -1,6 +1,10 @@
 {
-  "name": "gtn-signin-svelte",
-  "version": "0.0.3",
+  "name": "gtn-signin-widget",
+  "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/get-net/gtn-signin-widget.git"
+  },
   "scripts": {
     "build": "rollup -c",
     "dev": "rollup -c -w",
@@ -27,5 +31,6 @@
   ],
   "publishConfig": {
     "access": "public"
-  }
+  },
+  "author": "Arsenii Temnik"
 }

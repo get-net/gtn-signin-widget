@@ -4,14 +4,14 @@ let widgetConfig = {
     redirectUri: "http://localhost:5000/mainpage",
     appearance: {
         logo: {
-            src: "https://www.x5.ru/ru/assets/img/content/logo-01.jpg",
-            width: "100px"
+            src: "https://www.get-net.ru/img/logo.png",
+            width: "400px"
         },
-		signInFormText: "Зайти в пятерочку",
-		signUpFormText: "Зарегаться в пятерочке",
+		signInFormText: "Get-Net Sign in",
+		signUpFormText: "Get-Net Sign Up",
 		width: "500px"
     },
-    lang: "ru",
+    lang: "en",
     features: {
         registration: true,
         rememberMe : true

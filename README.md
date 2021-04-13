@@ -1,105 +1,117 @@
-*Looking for a shareable component template? Go here --> [sveltejs/component-template](https://github.com/sveltejs/component-template)*
 
 ---
 
-# svelte app
-
-This is a project template for [Svelte](https://svelte.dev) apps. It lives at https://github.com/sveltejs/template.
-
-To create a new project based on this template using [degit](https://github.com/Rich-Harris/degit):
-
-```bash
-npx degit sveltejs/template svelte-app
-cd svelte-app
-```
-
-*Note that you will need to have [Node.js](https://nodejs.org) installed.*
-
+# Get-Net SignIn Widget
+This library gives you a customizable login widget, that can be used to authenticate users on your web application
 
 ## Get started
+To use this library you need to do the following steps:
+1. Visit our [kyc service](https://id.gtn.ee/)
+2. Create your own application 
+![alt Applications list](img/applications.png)
+![alt create application](img/add_app.png)
+3. Provide redirect uri, its the base url of your app, where widget is gona be used
+4. After app is created you can click on edit icon add see a client ID, it will be needed later
+![alt create application](img/client.png)
 
-Install the dependencies...
 
-```bash
-cd svelte-app
-npm install
-```
-
-...then start [Rollup](https://rollupjs.org):
-
-```bash
-npm run dev
-```
-
-Navigate to [localhost:5000](http://localhost:5000). You should see your app running. Edit a component file in `src`, save it, and reload the page to see your changes.
-
-By default, the server will only respond to requests from localhost. To allow connections from other computers, edit the `sirv` commands in package.json to include the option `--host 0.0.0.0`.
-
-If you're using [Visual Studio Code](https://code.visualstudio.com/) we recommend installing the official extension [Svelte for VS Code](https://marketplace.visualstudio.com/items?itemName=svelte.svelte-vscode). If you are using other editors you may need to install a plugin in order to get syntax highlighting and intellisense.
-
-## Building and running in production mode
-
-To create an optimised version of the app:
+## Installation
+Using npm:
 
 ```bash
-npm run build
+    npm install gtn-signin-widget
+```
+Import the module
+```js
+    // ES module
+    import { SignInGTN } from 'gtn-signin-widget'
+    const widget = new SignInGTN({
+        // config
+    })
 ```
 
-You can run the newly built app with `npm run start`. This uses [sirv](https://github.com/lukeed/sirv), which is included in your package.json's `dependencies` so that the app will work when you deploy to platforms like [Heroku](https://heroku.com).
+Using unpkg
+```html
+    <script src="https://unpkg.com/gtn-signin-widget@latest/public/build/bundle.js"></script>
+```
+Instance of SignInGTN avaliable globally
+```js
+    const widget = new SignInGTN({
+        // config
+    })
+```
 
-
-## Single-page app mode
-
-By default, sirv will only respond to requests that match files in `public`. This is to maximise compatibility with static fileservers, allowing you to deploy your app anywhere.
-
-If you're building a single-page app (SPA) with multiple routes, sirv needs to be able to respond to requests for *any* path. You can make it so by editing the `"start"` command in package.json:
+## Usage
+You must provide configuration object and callbacks to SignInGTN instance:
 
 ```js
-"start": "sirv public --single"
+    let widgetConfig = {
+        client_uid: "your client id",
+        appearance: {
+            logo: {
+                src: "https://www.get-net.ru/img/logo.png",
+                width: "400px"
+            },
+            signInFormText: "Get-Net Sign in",
+            signUpFormText: "Get-Net Sign Up",
+            width: "500px" //total widget width
+        },
+        lang: "en", //or ru
+        features: {
+            registration: true, //registration feature is optional
+            rememberMe : true   //remember me feature is optional
+        }
+    }
+
+    const successCallback = function() {
+        //your success logic goes here
+    }
+    const errorCallback = function(error) {
+        //your error logic goes here
+    }
+    const widget = new SignInGTN(widgetConfig, successCallback, errorCallback)
 ```
 
-## Using TypeScript
+To render widget use renderEl function of created instance:
+```js
+    const widget = new SignInGTN(widgetConfig, scal, ercal)
 
-This template comes with a script to set up a TypeScript development environment, you can run it immediately after cloning the template with:
+    widget.renderEl("app") //optional id
+```
+Widget will be rendered inside the html element with id="app"
 
-```bash
-node scripts/setupTypeScript.js
+### Get Token
+```js
+    const token = widget.getToken()
 ```
 
-Or remove the script via:
-
-```bash
-rm scripts/setupTypeScript.js
+### Get UserInfo
+```js
+    const userInfo = widget.getUserInfo()
 ```
 
-## Deploying to the web
-
-### With [Vercel](https://vercel.com)
-
-Install `vercel` if you haven't already:
-
-```bash
-npm install -g vercel
+### Logout
+```js
+    widget.logout()
 ```
 
-Then, from within your project folder:
-
-```bash
-cd public
-vercel deploy --name my-project
+You can acces widget globally trough window object
+```js
+    let widget = window.$gtn_widget
 ```
-
-### With [surge](https://surge.sh/)
-
-Install `surge` if you haven't already:
-
-```bash
-npm install -g surge
+## Styling
+Apply default style for widget:
+using npm:
+```js
+    import 'gtn-signin-widget/public/build/bundle.css'
 ```
-
-Then, from within your project folder:
-
-```bash
-npm run build
-surge public my-project.surge.sh
+using unpkg:
+```html
+    <link rel="stylesheet" href="https://unpkg.com/gtn-signin-widget@latest/public/build/bundle.css"
 ```
+### Override default styles
+All ui elements of widget are inherited from gtn-widget-wrapper class
+
+input elements have widget-input class 
+
+For more detail information watch repository

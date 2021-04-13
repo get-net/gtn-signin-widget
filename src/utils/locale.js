@@ -41,6 +41,7 @@ export const lang = {
         sign_up: "Sign up",
         get_code: "Get Code",
         verification_code: "Verification code",
+        username: "Username",
         confirm_password: "Repeat password",
         reg_success: "Регистрация succeded",
         code_sent: "Verification code is sent to ",
