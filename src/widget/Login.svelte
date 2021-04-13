@@ -1,112 +1,122 @@
 <script>
-	import { onMount } from 'svelte';
-	import {lang} from "../utils/locale"
-	import matcher from "../utils/loginMatcher"
-	import api from "../api/kyc"
-    import { createEventDispatcher } from 'svelte';
+    import { onMount } from "svelte";
+    import { lang } from "../utils/locale";
+    import matcher from "../utils/loginMatcher";
+    import api from "../api/kyc";
+    import { createEventDispatcher } from "svelte";
 
     export let config;
 
     const dispatch = createEventDispatcher();
 
-	let loginType
-    let locale = lang[config.lang]
-	let codeSent = false
-	let login = ""
-	let password = ""
-	let remember = false
-	let error = ""
-    let resent_time_avaliable = 60
+    let loginType;
+    let locale = lang[config.lang];
+    let codeSent = false;
+    let login = "";
+    let password = "";
+    let remember = false;
+    let error = "";
+    let resent_time_avaliable = 60;
 
     function onRegisterClick() {
-		dispatch('switchComponent', 'register');
-	}
+        dispatch("switchComponent", "register");
+    }
 
-	onMount(async () => {
-		await checkUserInfo()
-	});
+    onMount(async () => {
+        await checkUserInfo();
+    });
 
-	function handleLoginChange(e) {
-		loginType = matcher.matchLoginType(e.target.value)
-	}
+    function handleLoginChange(e) {
+        loginType = matcher.matchLoginType(e.target.value);
+    }
 
-	async function onFormSubmit() {
-		let payload = {
-			login,
-			password,
-			client_uid: config.client_uid,
-			remember,
-            locale: config.lang
-		}
+    async function onFormSubmit() {
+        let payload = {
+            login,
+            password,
+            remember,
+            locale: config.lang,
+        };
 
-		let [resp_success, error_code] = await api.auth(payload)
-        error = error_code
+        let [resp_success, error_code] = await api.auth(
+            payload,
+            config.client_uid
+        );
+        error = error_code;
 
         if (resp_success) {
-            await checkUserInfo()
+            await checkUserInfo();
         }
-	}
+    }
 
-	async function OnGetCodeClick() {
-		let [resp_success, error_code] = await api.sendCode({number: login, locale: config.lang})
-        error = error_code
+    async function OnGetCodeClick() {
+        let [resp_success, error_code] = await api.sendCode(
+            { number: login, locale: config.lang },
+            config.client_uid
+        );
+        error = error_code;
         if (resp_success) {
-            codeSent = true
+            codeSent = true;
             let interval = setInterval(() => {
                 --resent_time_avaliable;
-                if (resent_time_avaliable <0) {
-                    clearInterval(interval)
+                if (resent_time_avaliable < 0) {
+                    clearInterval(interval);
                 }
-            }, 1000)
+            }, 1000);
         }
-	}
+    }
 
     async function checkUserInfo() {
         if (await api.userinfo()) {
-            window.$gtn_widget.successCallback()
+            window.$gtn_widget.successCallback();
         }
     }
 
     function onRestorePasswordClick() {
-        dispatch('switchComponent', 'recovery');
+        dispatch("switchComponent", "recovery");
     }
-
 </script>
 
 <div class="gtn-signin-form-wrapper">
-    <form class="gtn-signin-form"
-        on:submit|preventDefault={onFormSubmit}
-    >
-        <div class="sign-in-text"><h3>{config.appearance.signInFormText}</h3></div>
-        <hr/>
+    <form class="gtn-signin-form" on:submit|preventDefault={onFormSubmit}>
+        <div class="sign-in-text">
+            <h3>{config.appearance.signInFormText}</h3>
+        </div>
+        <hr />
         {#if error}
             <div class="alert-danger widget-alert">
-                {locale[error]} 
+                {locale[error]}
             </div>
         {/if}
 
-        <input 
-            name="username" 
-            id="username" 
-            placeholder={locale.login} 
+        <input
+            name="username"
+            id="username"
+            placeholder={locale.login}
             bind:value={login}
             class="widget-input"
             on:input={handleLoginChange}
         />
         {#if loginType == "email"}
-            <br/>
-            <input 
-                name="password" 
-                id="password" 
-                placeholder={locale.password} 
-                type="password" 
+            <br />
+            <input
+                name="password"
+                id="password"
+                placeholder={locale.password}
+                type="password"
                 class="widget-input"
                 bind:value={password}
             />
-            <br/>
+            <br />
             {#if config.features.rememberMe}
                 <div class="remember-block">
-                    <input class="widget-input-check" type="checkbox" id="flexCheckDefault" name="rememberMe" bind:value={remember}>
+                    <input
+                        class="widget-input-check"
+                        type="checkbox"
+                        id="flexCheckDefault"
+                        name="rememberMe"
+                        bind:value={remember}
+                    />
                     <label class="" for="flexCheckDefault">
                         {locale.remember}
                     </label>
@@ -115,61 +125,78 @@
             <div class="link" on:click={onRestorePasswordClick}>
                 <p class="code_sent">{locale.reset_password}</p>
             </div>
-            <br/>
-            <input id="submitBtn" type="submit" class="widget-input widget-btn" value="{locale.sign_in}"/>
+            <br />
+            <input
+                id="submitBtn"
+                type="submit"
+                class="widget-input widget-btn"
+                value={locale.sign_in}
+            />
         {/if}
-        {#if loginType == "sms" & codeSent}
-            <br/>
-            <input 
-                name="verification_code" 
-                id="verification_code" 
+        {#if (loginType == "sms") & codeSent}
+            <br />
+            <input
+                name="verification_code"
+                id="verification_code"
                 placeholder={locale.verification_code}
                 class="form-control widget-input"
                 bind:value={password}
             />
-            <br/>
-            {#if resent_time_avaliable >=0}
+            <br />
+            {#if resent_time_avaliable >= 0}
                 <div>
-                    <p class="code_sent">{locale.resent_code} {locale.after} {resent_time_avaliable}</p>
+                    <p class="code_sent">
+                        {locale.resent_code}
+                        {locale.after}
+                        {resent_time_avaliable}
+                    </p>
                 </div>
             {:else}
                 <div>
                     <input
-                        id="submitBtn" 
-                        type="button" 
-                        class="widget-input widget-btn" 
-                        value="{locale.resent_code}"
-                        on:click={OnGetCodeClick}		
+                        id="submitBtn"
+                        type="button"
+                        class="widget-input widget-btn"
+                        value={locale.resent_code}
+                        on:click={OnGetCodeClick}
                     />
                 </div>
             {/if}
             {#if config.features.rememberMe}
                 <div class="remember-block">
-                    <input class="widget-input-check" type="checkbox" id="flexCheckDefault" name="rememberMe" bind:value={remember}>
+                    <input
+                        class="widget-input-check"
+                        type="checkbox"
+                        id="flexCheckDefault"
+                        name="rememberMe"
+                        bind:value={remember}
+                    />
                     <label for="flexCheckDefault">
                         {locale.remember}
                     </label>
                 </div>
             {/if}
-            <br/>
-            <input id="submitBtn" type="submit" class="widget-input widget-btn" value="{locale.sign_in}"/>
+            <br />
+            <input
+                id="submitBtn"
+                type="submit"
+                class="widget-input widget-btn"
+                value={locale.sign_in}
+            />
         {/if}
-        {#if loginType == "sms" & !codeSent}
-            <br/>
-            <input 
-                id="submitBtn" 
-                type="button" 
-                class="widget-input widget-btn" 
-                value="{locale.get_code}"
-                on:click={OnGetCodeClick}		
+        {#if (loginType == "sms") & !codeSent}
+            <br />
+            <input
+                id="submitBtn"
+                type="button"
+                class="widget-input widget-btn"
+                value={locale.get_code}
+                on:click={OnGetCodeClick}
             />
         {/if}
         {#if config.features.registration}
-            <hr/>
-            <div
-                on:click={onRegisterClick} 
-                class="link"
-            >
+            <hr />
+            <div on:click={onRegisterClick} class="link">
                 {locale.sign_up}
             </div>
         {/if}
@@ -198,5 +225,4 @@
         float: left;
         margin-bottom: 1rem;
     }
-
 </style>

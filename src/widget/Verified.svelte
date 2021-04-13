@@ -1,6 +1,8 @@
 <div class="verified">
     <h2>Verification Success</h2>
-    <p>Your Email address is verified. You may now login with your credentials</p>
+    <p>
+        Your Email address is verified. You may now login with your credentials
+    </p>
     <a href="/login" class="link">Login</a>
 </div>
 

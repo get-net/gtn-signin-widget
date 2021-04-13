@@ -29,7 +29,7 @@ export const lang = {
         revovery_sent: "Ссылка для восстановления отправлена на ",
         enter: "Вход",
         passwords_not_match: "Пароли не совпадают",
-        verification_failed: "Неверный код подтверждения"
+        verification_failed: "Неверный код подтверждения",
     },
     en: {
         login: "Email or phone number",
@@ -61,6 +61,7 @@ export const lang = {
         revovery_sent: "Recovery link sent to ",
         enter: "Sign in",
         passwords_not_match: "Passwords do not match",
-        verification_failed: "The code is invalid or already acknowledged. please try again later"
-    }
-}
+        verification_failed:
+            "The code is invalid or already acknowledged. please try again later",
+    },
+};
