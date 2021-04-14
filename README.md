@@ -94,6 +94,10 @@ Widget will be rendered inside the html element with id="app"
 ```js
     widget.logout()
 ```
+### Check User unfo
+```js
+    const token_valid = await widget.checkTokenValid()
+```
 
 You can acces widget globally trough window object
 ```js

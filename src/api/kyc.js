@@ -18,7 +18,7 @@ export default {
             });
     },
 
-    async userinfo() {
+    async userinfo(call_err = true) {
         let headers = { Authorization: `Bearer ${storageManager.getToken()}` };
         return kyc
             .get("oauth/userinfo", { headers: headers })
@@ -27,7 +27,10 @@ export default {
                 return true;
             })
             .catch((er) => {
-                window.$gtn_widget.errorCallback(er);
+                if(call_err) {
+                    window.$gtn_widget.errorCallback(er);
+                }
+
                 return false;
             });
     },

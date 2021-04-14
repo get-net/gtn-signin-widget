@@ -1,10 +1,37 @@
 
 import App from './App.svelte';
-import storomageManager from '../utils/storageManager'
 import storageManager from '../utils/storageManager';
+import kyc from '../api/kyc'
+
+const defaultConfig = {
+    client_uid: null,
+    appearance: {
+        logo: {
+            src: "https://www.get-net.ru/img/logo.png",
+            width: "400px"
+        },
+		signInFormText: "Get-Net Sign in",
+		signUpFormText: "Get-Net Sign Up",
+		width: "500px"
+    },
+    lang: "en",
+    features: {
+        registration: true,
+        rememberMe : true
+    }
+}
+
+const defaultSuccess = function() {
+
+}
+
+const defaultError = function() {
+
+}
+
 export class SignInGTN {
 
-    constructor(widgetConfig, successCallback = null, errorCallback = null) {
+    constructor(widgetConfig = defaultConfig, successCallback = defaultSuccess, errorCallback = defaultError) {
         this.config = widgetConfig
         this.successCallback = successCallback
         this.errorCallback = errorCallback
@@ -21,15 +48,19 @@ export class SignInGTN {
     }
 
     getToken() {
-        return storomageManager.getToken();
+        return storageManager.getToken();
     }
 
     getUserInfo() {
-        return storomageManager.getUserInfo();
+        return storageManager.getUserInfo();
     }
 
     logout() {
         storageManager.removeToken();
         storageManager.removeUserInfo()
+    }
+
+    async checkTokenValid() {
+        return await kyc.userinfo(false)
     }
 }
