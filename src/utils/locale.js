@@ -30,6 +30,7 @@ export const lang = {
         enter: "Вход",
         passwords_not_match: "Пароли не совпадают",
         verification_failed: "Неверный код подтверждения",
+        default_error: "Ошибка"
     },
     en: {
         login: "Email or phone number",
@@ -63,5 +64,6 @@ export const lang = {
         passwords_not_match: "Passwords do not match",
         verification_failed:
             "The code is invalid or already acknowledged. please try again later",
+        default_error: "Ошибка"
     },
 };

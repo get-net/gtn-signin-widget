@@ -14,7 +14,7 @@ export default {
             })
             .catch((er) => {
                 window.$gtn_widget.errorCallback(er);
-                return [false, er];
+                return [false, 'default_error'];
             });
     },
 
@@ -44,7 +44,7 @@ export default {
             })
             .catch((er) => {
                 window.$gtn_widget.errorCallback(er);
-                return [false, er];
+                return [false, 'default_error'];
             });
     },
 
@@ -72,7 +72,7 @@ export default {
             })
             .catch((er) => {
                 window.$gtn_widget.errorCallback(er);
-                return [false, er];
+                return [false, 'default_error'];
             });
     },
 
@@ -88,7 +88,7 @@ export default {
             })
             .catch((er) => {
                 window.$gtn_widget.errorCallback(er);
-                return [false, er];
+                return [false, 'default_error'];
             });
     },
 };
